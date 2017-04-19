@@ -14,18 +14,33 @@ class MeteorologistController < ApplicationController
     #
     # The street address that the user typed is in the variable @street_address.
     # ==========================================================================
+    url = "http://maps.googleapis.com/maps/api/geocode/json?address="+@street_address
+
+    parsed_data = JSON.parse(open(url).read)
+    latitude = parsed_data["results"][0]["geometry"]["location"]["lat"]
+    longitude = parsed_data["results"][0]["geometry"]["location"]["lng"]
+
+    key = "738130ff27ade86172e5b00a210c7443"
+
+    url_forecast = "https://api.darksky.net/forecast/" + key + "/" + latitude.to_s + "," + longitude.to_s
+
+    parsed_data_forecast = JSON.parse(open(url_forecast).read)
+    curr_temp = parsed_data_forecast["currently"]["temperature"]
+    curr_sum = parsed_data_forecast["currently"]["summary"]
+    min_sum = parsed_data_forecast["minutely"]["summary"]
+    hr_sum = parsed_data_forecast["hourly"]["summary"]
+    daily_sum = parsed_data_forecast["daily"]["summary"]
 
 
+    @current_temperature = curr_temp
 
-    @current_temperature = "Replace this string with your answer."
+    @current_summary = curr_sum
 
-    @current_summary = "Replace this string with your answer."
+    @summary_of_next_sixty_minutes = min_sum
 
-    @summary_of_next_sixty_minutes = "Replace this string with your answer."
+    @summary_of_next_several_hours = hr_sum
 
-    @summary_of_next_several_hours = "Replace this string with your answer."
-
-    @summary_of_next_several_days = "Replace this string with your answer."
+    @summary_of_next_several_days = daily_sum
 
     render("meteorologist/street_to_weather.html.erb")
   end
